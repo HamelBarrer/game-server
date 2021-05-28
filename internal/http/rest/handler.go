@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	"gitlab.com/HamelBarrer/game-server/internal/controller/user"
+	midd "gitlab.com/HamelBarrer/game-server/internal/middleware"
 )
 
 func Handler() {
@@ -20,6 +21,9 @@ func Handler() {
 
 	r.Route("/api/v1/users", func(r chi.Router) {
 		r.Post("/login", user.Login)
+		r.Post("/", user.CreateUser)
+		r.With(midd.VerificationToken).Get("/", user.ListUser)
+		r.With(midd.VerificationToken).Get("/{id}", user.GetUser)
 	})
 
 	PORT := os.Getenv("PORT")

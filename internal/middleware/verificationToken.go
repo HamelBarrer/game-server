@@ -8,9 +8,14 @@ import (
 
 func VerificationToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := jwt.ValidationToken(r.Header.Get("Authorization"))
+		token := r.Header.Get("Authorization")
+		if token == "" {
+			http.Error(w, "token not provider", http.StatusBadRequest)
+			return
+		}
+		err := jwt.ValidationToken(token)
 		if err != nil {
-			http.Error(w, "token incorrect", http.StatusForbidden)
+			http.Error(w, "token incorrect "+err.Error(), http.StatusForbidden)
 			return
 		}
 

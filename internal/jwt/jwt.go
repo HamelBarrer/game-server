@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"gitlab.com/HamelBarrer/game-server/internal/model"
@@ -41,12 +42,9 @@ func init() {
 }
 
 func CreateToken(u model.User) (string, error) {
-	claims := model.Claim{
-		User: u.ID.Hex(),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: jwt.NewTime(3600),
-			Issuer:    "access app",
-		},
+	claims := jwt.MapClaims{
+		"user": u.ID.Hex(),
+		"exp":  time.Now().Add(1 * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
@@ -61,10 +59,11 @@ func CreateToken(u model.User) (string, error) {
 func ValidationToken(token string) error {
 	splitToken := strings.Split(token, "Bearer")
 	if len(splitToken) != 2 {
-		return errors.New("format incorrect")
+		return errors.New("formato de token invalido")
 	}
+	tk := strings.TrimSpace(splitToken[1])
 
-	tok, err := jwt.ParseWithClaims(token, model.Claim{}, func(t *jwt.Token) (interface{}, error) {
+	tok, err := jwt.ParseWithClaims(tk, &model.Claim{}, func(t *jwt.Token) (interface{}, error) {
 		return publicKey, nil
 	})
 	if err != nil {

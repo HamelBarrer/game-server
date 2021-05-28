@@ -36,6 +36,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
 		Value:   token,
-		Expires: time.Now().Add(3600 * time.Second),
+		Expires: time.Now().Add(1 * time.Hour),
 	})
 }
