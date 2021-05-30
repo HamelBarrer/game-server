@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -11,9 +12,12 @@ import (
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	var u model.User
 
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		fmt.Println(err)
 		http.Error(w, "format incorrect of json", http.StatusBadRequest)
 		return
 	}
@@ -29,13 +33,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendToken := model.ResponseToken{Token: token}
-
-	json.NewEncoder(w).Encode(sendToken)
-
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
 		Value:   token,
 		Expires: time.Now().Add(1 * time.Hour),
 	})
+	w.WriteHeader(http.StatusOK)
 }

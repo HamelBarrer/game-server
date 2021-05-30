@@ -25,6 +25,7 @@ func Handler() {
 		r.Post("/", user.CreateUser)
 		r.With(midd.VerificationToken).Get("/", user.ListUser)
 		r.With(midd.VerificationToken).Get("/{id}", user.GetUser)
+		r.With(midd.VerificationToken).Put("/", user.UpdateUser)
 	})
 
 	r.Route("/api/v1/roles", func(r chi.Router) {
